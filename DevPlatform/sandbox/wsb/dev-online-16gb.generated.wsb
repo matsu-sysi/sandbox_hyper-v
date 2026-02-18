@@ -1,0 +1,39 @@
+﻿<Configuration>
+  <vGPU>Enable</vGPU>
+  <Networking>Enable</Networking>
+  <ClipboardRedirection>Enable</ClipboardRedirection>
+  <AudioInput>Disable</AudioInput>
+  <VideoInput>Disable</VideoInput>
+  <PrinterRedirection>Disable</PrinterRedirection>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>V:\sandbox_hyper-v\DevPlatform\sandbox\scripts</HostFolder>
+      <SandboxFolder>C:\Bootstrap</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>V:\sandbox_hyper-v\DevPlatform\sandbox\config</HostFolder>
+      <SandboxFolder>C:\Config</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>V:\sandbox_hyper-v\DevPlatform\sandbox\logs</HostFolder>
+      <SandboxFolder>C:\Logs</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>V:\sandbox_hyper-v\DevPlatform\projects</HostFolder>
+      <SandboxFolder>C:\Projects</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>C:\Mark2</HostFolder>
+      <SandboxFolder>C:\Apps\Mark2</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <MemoryInMB>16384</MemoryInMB>
+  <LogonCommand>
+    <Command>powershell.exe -ExecutionPolicy Bypass -File C:\Bootstrap\bootstrap.ps1</Command>
+  </LogonCommand>
+</Configuration>

@@ -1,0 +1,12 @@
+[
+  {
+    "HostFolder": "C:\\Mark2",
+    "SandboxFolder": "C:\\Apps\\Mark2",
+    "ReadOnly": true
+  },
+  {
+    "HostFolder": "D:\\CompanyTools\\ToolA",
+    "SandboxFolder": "C:\\Apps\\ToolA",
+    "ReadOnly": true
+  }
+]

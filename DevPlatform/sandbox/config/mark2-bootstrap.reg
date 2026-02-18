@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+; Place HKCU\Software\System-I\Mark2 export content here.
+; Use: sandbox\scripts\export-mark2-reg.ps1 on host.
