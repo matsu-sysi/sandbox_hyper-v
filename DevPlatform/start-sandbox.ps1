@@ -111,6 +111,7 @@ try {
     RunId = $RunId
     LogDate = $LogDate
     RunLogPathInSandbox = "C:\Logs\run-$RunId.log"
+    StatusLogPathInSandbox = "C:\Logs\status-$RunId.log"
   }
   $session | ConvertTo-Json -Depth 4 | Set-Content -Path $sessionPath -Encoding UTF8
 

@@ -3,23 +3,27 @@
 # 目的:
 # - Sandbox起動直後の開発環境初期化
 # - ローカルインストーラ優先で導入
-# - 1起動1ログ(run-<id>.log)へ追記する
+# - 進捗を status-<runid>.log に追記して可視化
 
 $sessionPath = 'C:\Config\session.json'
 if (Test-Path $sessionPath) {
   $session = Get-Content -Raw $sessionPath | ConvertFrom-Json
   $bootstrapLog = $session.RunLogPathInSandbox
+  $statusLog = $session.StatusLogPathInSandbox
 }
 else {
   $timestamp = Get-Date -Format yyyyMMdd-HHmmss
   $bootstrapLog = "C:\Logs\bootstrap-$timestamp.log"
+  $statusLog = "C:\Logs\status-$timestamp.log"
+}
+
+function Write-Status([string]$message) {
+  $line = "[{0}] {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $message
+  $line | Out-File -FilePath $statusLog -Encoding utf8 -Append
 }
 
 Start-Transcript -Path $bootstrapLog -Append -Force | Out-Null
-
-function Test-CommandExists([string]$name) {
-  return [bool](Get-Command $name -ErrorAction SilentlyContinue)
-}
+Write-Status 'BOOTSTRAP_START'
 
 function Add-ToPathIfExists([string]$path) {
   if (Test-Path $path) {
@@ -39,19 +43,39 @@ function Refresh-SessionPath {
   }
 }
 
+function Get-CommandVersionLine([string]$command) {
+  try {
+    switch ($command) {
+      'code' {
+        $line = (code --version 2>&1 | Select-Object -First 1)
+        if ($line) { return $line.ToString().Trim() }
+      }
+      default {
+        $line = (& $command --version 2>&1 | Select-Object -First 1)
+        if ($line) { return $line.ToString().Trim() }
+      }
+    }
+  }
+  catch {}
+  return $null
+}
+
+function Is-CommandUsable([string]$command) {
+  if (-not (Get-Command $command -ErrorAction SilentlyContinue)) { return $false }
+  $version = Get-CommandVersionLine -command $command
+  return -not [string]::IsNullOrWhiteSpace($version)
+}
+
 function Install-FromLocalInstaller($pkg) {
   $installerPath = Join-Path 'C:\Installers' $pkg.installerFile
   if (-not (Test-Path $installerPath)) {
     throw "Local installer not found: $installerPath"
   }
 
+  Write-Status "INSTALL_START $($pkg.id)"
   Write-Host "Installing $($pkg.id) from local installer..." -ForegroundColor Yellow
-  $timeoutSec = 600
-  if ($pkg.timeoutSec) {
-    $timeoutSec = [int]$pkg.timeoutSec
-  }
+  $timeoutSec = if ($pkg.timeoutSec) { [int]$pkg.timeoutSec } else { 600 }
 
-  $proc = $null
   if ($pkg.installerType -eq 'msi') {
     $args = "/i `"$installerPath`" $($pkg.silentArgs)"
     $proc = Start-Process -FilePath 'msiexec.exe' -ArgumentList $args -PassThru
@@ -68,21 +92,21 @@ function Install-FromLocalInstaller($pkg) {
   if ($proc.ExitCode -ne 0) {
     throw "Installer exit code $($proc.ExitCode): $($pkg.installerFile)"
   }
-}
 
-function Install-FromWinget($pkg) {
-  Write-Host "Fallback(winget): Installing $($pkg.id) $($pkg.version)" -ForegroundColor Yellow
-  winget install --id $pkg.id --version $pkg.version -e --accept-source-agreements --accept-package-agreements --disable-interactivity
+  Write-Status "INSTALL_DONE $($pkg.id)"
 }
 
 function Install-VSCodeExtensions([string[]]$extensionIds) {
   foreach ($ext in $extensionIds) {
+    Write-Status "EXT_START $ext"
     Write-Host "Installing VS Code extension: $ext" -ForegroundColor Yellow
     try {
-      code --install-extension $ext --force
+      code --install-extension $ext --force | Out-Null
+      Write-Status "EXT_DONE $ext"
     }
     catch {
       Write-Warning "Failed to install VS Code extension: $ext"
+      Write-Status "EXT_FAIL $ext"
     }
   }
 }
@@ -94,6 +118,7 @@ try {
 
   $mark2Reg = 'C:\Config\mark2-bootstrap.reg'
   if (Test-Path $mark2Reg) {
+    Write-Status 'MARK2_REG_IMPORT'
     Write-Host 'Importing Mark2 HKCU bootstrap registry...' -ForegroundColor Cyan
     reg import $mark2Reg | Out-Null
   }
@@ -103,12 +128,15 @@ try {
 
   foreach ($pkg in $lock.packages) {
     if ($null -ne $pkg.autoInstall -and -not [bool]$pkg.autoInstall) {
+      Write-Status "SKIP_AUTO_FALSE $($pkg.id)"
       Write-Host "Skipping $($pkg.id): autoInstall=false." -ForegroundColor DarkYellow
       continue
     }
 
-    if ($pkg.command -and (Test-CommandExists -name $pkg.command)) {
-      Write-Host "Skipping $($pkg.id): '$($pkg.command)' already exists." -ForegroundColor DarkGreen
+    if ($pkg.command -and (Is-CommandUsable -command $pkg.command)) {
+      $ver = Get-CommandVersionLine -command $pkg.command
+      Write-Status "SKIP_USABLE $($pkg.id) $ver"
+      Write-Host "Skipping $($pkg.id): '$($pkg.command)' usable ($ver)." -ForegroundColor DarkGreen
       continue
     }
 
@@ -116,31 +144,22 @@ try {
       Install-FromLocalInstaller -pkg $pkg
     }
     catch {
-      if ($lock.useWingetFallback -eq $true -and (Get-Command winget -ErrorAction SilentlyContinue)) {
-        try {
-          Install-FromWinget -pkg $pkg
-        }
-        catch {
-          $failedPackages.Add("$($pkg.id): $($_.Exception.Message)") | Out-Null
-        }
-      }
-      else {
-        $failedPackages.Add("$($pkg.id): $($_.Exception.Message)") | Out-Null
-      }
+      $failedPackages.Add("$($pkg.id): $($_.Exception.Message)") | Out-Null
+      Write-Status "INSTALL_FAIL $($pkg.id)"
     }
   }
 
   Refresh-SessionPath
-  # PATH再読込で消えるため、ホストツール参照を再追加する。
   Add-ToPathIfExists 'C:\HostTools\VSCodeBin'
   Add-ToPathIfExists 'C:\HostTools\GitCmd'
   Add-ToPathIfExists 'C:\HostTools\GitBin'
 
-  if (Test-CommandExists -name 'code') {
+  if (Is-CommandUsable -command 'code') {
     Install-VSCodeExtensions -extensionIds $lock.vscodeExtensions
   }
   else {
-    Write-Warning 'VS Code command (code) is not available after setup.'
+    Write-Warning 'VS Code command (code) is not usable after setup.'
+    Write-Status 'WARN_CODE_NOT_USABLE'
   }
 
   if (Test-Path 'C:\Bootstrap\verify.ps1') {
@@ -149,9 +168,13 @@ try {
 
   if ($failedPackages.Count -gt 0) {
     Write-Warning 'Some package installs failed:'
-    $failedPackages | ForEach-Object { Write-Warning $_ }
+    $failedPackages | ForEach-Object {
+      Write-Warning $_
+      Write-Status "FAIL_DETAIL $_"
+    }
   }
 
+  Write-Status 'BOOTSTRAP_DONE'
   Start-Process explorer.exe C:\Projects
 }
 finally {

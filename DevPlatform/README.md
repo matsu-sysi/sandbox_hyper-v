@@ -53,8 +53,9 @@ DevPlatform/
 - `projects` は RW マウント（ソース保管）
 - `sandbox\cache\installers` は RO マウントで `C:\Installers`
 - アプリ追加マウントは `extra-mapped-folders.json`
-- ホスト既存ツールの参照は `host-tools.json`（任意）
+- ホスト既存ツールの参照は `host-tools.json`（任意・既定無効）
 - ログは `YYYY-MM-DD\run-<起動ID>.log` に1起動1ファイルで集約
+- 進捗は `YYYY-MM-DD\status-<起動ID>.log` でも確認可能
 
 ## ツール導入フロー（bootstrap）
 
@@ -67,7 +68,7 @@ DevPlatform/
 
 注記:
 - `env.lock.json` の `autoInstall=false` は起動時に自動導入しません
-- 現在は安定性優先で `Python/Node` を `autoInstall=false` にしています
+- 現在は安定性優先で `Git/VSCode` を自動導入、`Python/Node` は `autoInstall=false`（必要時にON）
 
 ## インストーラ更新
 
