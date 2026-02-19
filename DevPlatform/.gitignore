@@ -1,0 +1,14 @@
+# logs: 実行ログは追跡しない
+sandbox/logs/*
+
+sandbox/wsb/*.generated.wsb
+
+# installers: 大容量バイナリはGit管理しない
+sandbox/cache/installers/*
+!sandbox/cache/installers/README.md
+!sandbox/cache/installers/installers.manifest.json
+
+# machine-specific/sensitive data
+sandbox/config/mark2-bootstrap.reg
+!sandbox/config/mark2-bootstrap.sample.reg
+sandbox/config/session.json

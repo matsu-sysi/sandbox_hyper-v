@@ -1,0 +1,20 @@
+[
+  {
+    "Name": "VSCodeBin",
+    "HostFolder": "C:\\Users\\mt\\AppData\\Local\\Programs\\Microsoft VS Code\\bin",
+    "SandboxFolder": "C:\\HostTools\\VSCodeBin",
+    "Enabled": true
+  },
+  {
+    "Name": "GitCmd",
+    "HostFolder": "C:\\Program Files\\Git\\cmd",
+    "SandboxFolder": "C:\\HostTools\\GitCmd",
+    "Enabled": true
+  },
+  {
+    "Name": "GitBin",
+    "HostFolder": "C:\\Program Files\\Git\\bin",
+    "SandboxFolder": "C:\\HostTools\\GitBin",
+    "Enabled": true
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-02-19T01:40:09.2716787+09:00",
+  "items": [
+    {
+      "name": "VSCode",
+      "version": "latest-stable",
+      "url": "https://update.code.visualstudio.com/latest/win32-x64-user/stable",
+      "file": "V:\\sandbox_hyper-v\\DevPlatform\\sandbox\\cache\\installers\\VSCodeUserSetup-x64-latest.exe",
+      "sha256": "C4E2FA253A0707433B11CBCF75342CC3D76F62687847D70CFE183223B801A571",
+      "size_bytes": 125944112
+    },
+    {
+      "name": "Git",
+      "version": "v2.53.0.windows.1",
+      "url": "https://github.com/git-for-windows/git/releases/download/v2.53.0.windows.1/Git-2.53.0-64-bit.exe",
+      "file": "V:\\sandbox_hyper-v\\DevPlatform\\sandbox\\cache\\installers\\Git-2.53.0-64-bit.exe",
+      "sha256": "3B4E1B127DBEBEA2931F2AE9DFAFA0C2343A488A1222009DEBFE78D5D335E6A9",
+      "size_bytes": 64573288
+    },
+    {
+      "name": "Node.js LTS",
+      "version": "v24.13.1",
+      "url": "https://nodejs.org/dist/v24.13.1/node-v24.13.1-x64.msi",
+      "file": "V:\\sandbox_hyper-v\\DevPlatform\\sandbox\\cache\\installers\\node-v24.13.1-x64.msi",
+      "sha256": "03FE815E236AD8FB6FA4289921A746E1492571ACEE49105154F2CC0B07021515",
+      "size_bytes": 32235520
+    },
+    {
+      "name": "Python",
+      "version": "3.13.12",
+      "url": "https://www.python.org/ftp/python/3.13.12/python-3.13.12-amd64.exe",
+      "file": "V:\\sandbox_hyper-v\\DevPlatform\\sandbox\\cache\\installers\\python-3.13.12-amd64.exe",
+      "sha256": "96159FCB523AE404B707186A75B4104EE23851E476A5E838E14584CF1E03F981",
+      "size_bytes": 29096776
+    }
+  ]
+}

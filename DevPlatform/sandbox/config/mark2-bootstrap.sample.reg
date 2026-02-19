@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+; サンプル: 実運用では export-mark2-reg.ps1 で mark2-bootstrap.reg を生成してください。
+; 対象キー: HKCU\Software\System-I\Mark2

@@ -1,4 +1,5 @@
 <Configuration>
+  <!-- 固定パス互換版。通常は start-sandbox.ps1 が生成する .generated.wsb を利用する。 -->
   <vGPU>Enable</vGPU>
   <Networking>Enable</Networking>
   <ClipboardRedirection>Enable</ClipboardRedirection>
@@ -6,6 +7,7 @@
   <VideoInput>Disable</VideoInput>
   <PrinterRedirection>Disable</PrinterRedirection>
   <MappedFolders>
+    <!-- Bootstrap/Config は読み取り専用、Logs/Projects は書き込み可。 -->
     <MappedFolder>
       <HostFolder>V:\sandbox_hyper-v\DevPlatform\sandbox\scripts</HostFolder>
       <SandboxFolder>C:\Bootstrap</SandboxFolder>
